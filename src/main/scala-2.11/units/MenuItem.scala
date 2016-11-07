@@ -1,6 +1,6 @@
 package units
 
-sealed trait MenuItem {
+trait MenuItem {
   def name: String
 
   def tempCategory: TempCategory
