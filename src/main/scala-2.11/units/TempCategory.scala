@@ -6,10 +6,10 @@ sealed trait TempCategory {
   override def toString = tempCategory
 }
 
-trait Cold extends TempCategory {
+case object Cold extends TempCategory {
   def tempCategory: String = "Cold"
 }
 
-trait Hot extends TempCategory {
+case object Hot extends TempCategory {
   def tempCategory: String = "Hot"
 }

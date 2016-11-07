@@ -1,15 +1,15 @@
 package units
 
 
-sealed trait ItemType {
+sealed trait ItemCategory {
   def itemType: String
 }
 
-trait Food extends ItemType {
+case object Food extends ItemCategory {
   def itemType: String = "Food"
 }
 
-trait Drinks extends ItemType {
+case object Drinks extends ItemCategory {
   def itemType: String = "Drinks"
 }
 

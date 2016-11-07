@@ -65,8 +65,20 @@ class PriceCalculatorTest extends WordSpec {
       }
 
       "calculate the price of the order correctly, when order includes hot food and service charge total is less than £20" in {
-        val input = List(Cola, Coffee, CheeseSandwich, SteakSandwich)
-        val expectedTotal = 0.0
+
+        val testObj = SteakSandwich
+        val maxOrder: Int = (20 / (testObj.price * 0.2).ceil).toInt + 1 // maximum order to keep service charge under £20 for the given test order object
+        // test validation
+        testObj.tempCategory shouldBe Hot
+        testObj.itemCategory shouldBe Food
+
+        maxOrder * testObj.price <= 20.0 shouldBe true
+        maxOrder + 1 * testObj.price <= 20.0 shouldBe false
+
+        // test
+        val input = List.fill(maxOrder)(testObj)
+
+        val expectedTotal = testObj.price * maxOrder
         val expectedServiceCharge = expectedTotal * .20
 
         val Bill(total, serviceCharge) = PriceCalculator.calcWithServiceCharge(input)
@@ -78,12 +90,21 @@ class PriceCalculatorTest extends WordSpec {
       "calculate the price of the order correctly, when order includes hot food and service charge total is more than £20" in {
         val testObj = SteakSandwich
 
-        testObj.isInstanceOf[Hot] shouldBe true
-        testObj.isInstanceOf[Food] shouldBe true
+        // test validation
+        testObj.tempCategory shouldBe Hot
+        testObj.itemCategory shouldBe Food
 
-        val minOrder: Int = (20 / (testObj.price * 0.2).ceil).toInt + 1 // minimum order required to get service charge over £20 for the given test order object
-        val input = List.fill(minOrder)(SteakSandwich)
-        val expectedTotal = SteakSandwich.price * minOrder
+        val minOrder: Int = (20 / (testObj.price * 0.2).ceil).toInt match {
+          case service if service * testObj.price <= 20 => service + 1
+          case service => service
+        }  // minimum order required to get service charge over £20 for the given test order object
+
+        minOrder * testObj.price > 20.0 shouldBe true
+        minOrder - 1 * testObj.price > 20.0 shouldBe false
+
+        // test
+        val input = List.fill(minOrder)(testObj)
+        val expectedTotal = testObj.price * minOrder
         val expectedServiceCharge = 20
 
         val Bill(total, serviceCharge) = PriceCalculator.calcWithServiceCharge(input)
